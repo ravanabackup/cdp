@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic URL Replacer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #urlInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #outputBox {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #convertBtn, #downloadBtn {
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dynamic URL Replacer</h1>
+
+    <textarea id="urlInput" rows="5" placeholder="Enter URLs, one per line"></textarea>
+    <br>
+    <button id="convertBtn">Convert URLs</button>
+
+    <h3>Converted URLs:</h3>
+    <textarea id="outputBox" rows="5" readonly></textarea>
+
+    <script>
+        document.getElementById('convertBtn').addEventListener('click', function () {
+            let urls = document.getElementById('urlInput').value.trim().split('\n');
+            let convertedUrls = urls.map(url => replaceUrl(url));
+            document.getElementById('outputBox').value = convertedUrls.join('\n');
+            openUrlsInNewTabs(convertedUrls);
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', function () {
+            let outputText = document.getElementById('outputBox').value;
+            let blob = new Blob([outputText], { type: 'text/plain' });
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'converted_urls.txt';
+            link.click();
+        });
+
+        function replaceUrl(url) {
+            const baseRegex = /https:\/\/codepen\.io\/([^\/]+)\/pen\/([a-zA-Z0-9]+)/;
+            if (baseRegex.test(url)) {
+                return url.replace(baseRegex, 'https://codepen.io/cpe/pen/export/$2');
+            }
+            return url; // Return the original URL if it doesn't match the pattern
+        }
+
+        function openUrlsInNewTabs(urls) {
+            urls.forEach(url => {
+                window.open(url, '_blank');
+            });
+        }
+    </script>
+
+</body>
+</html>
